@@ -582,7 +582,7 @@ async def ArohiRefuse(owner,uid, K,V):
         1: int(owner),
         2: 1,
         3: int(uid),
-        4: "[FF0000][B][C] ERROR , WELCOME TO [FFFFFF]REDZED [00FF00] AROHI BOT ! \n[FFFF00]NEW VERSION NEW FUNCTION !\n[FF0000]TELEGRAM : @classic_arohi\n\n"
+        4: "[FF0000][B][C] ERROR , WELCOME TO [FFFFFF]FORKTHUB [00FF00] FORKTHUBx BOT ! \n[FFFF00]NEW VERSION NEW FUNCTION !\n[FF0000]TELEGRAM : @SukitooV1\n\n"
     }
     }
     return await GeneRaTePk((await CrEaTe_ProTo(fields)).hex() , '0515' , K , V)

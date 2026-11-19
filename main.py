@@ -98,21 +98,21 @@ last_status_packet = None
 START_SPAM_DURATION = 18     
 WAIT_AFTER_MATCH_SECONDS = 20 
 START_SPAM_DELAY = 0.2       
-region = 'PK'
+region = 'ID'
 WHITELISTED_UIDS = {
-    "MĢ24_GÀMER", # don't change this text
-    "415136165"
+    "ForktHubX", # don't change this text
+    "258103581"
 }
 # ADMIN INFO FUNCTION FOR ADMIN COMMAND 
-ADMIN_UID = "1901614992"
-ADMIN_UIDS = {"1901614992" , ""}
+ADMIN_UID = "258103581"
+ADMIN_UIDS = {"258103581" , ""}
 BLOCKED_UIDS = set()  # UIDs blocked from using the bot
 news_pending = {}  # Tracks which chat/uid is waiting for news country selection
 _console_guild_chat_id = None   # Clan chat ID used for console → guild sending
 _console_guild_bot_uid = None   # Bot's own UID for sending
 _console_guild_chat_type = 1    # 1 = CLan chat type
 _console_squad_chat_id = None   # Squad/group chat ID
-_console_chat_target = "guild"  # "guild" or "group" — which chat console sends to
+_console_chat_target = "group"  # "guild" or "group" — which chat console sends to
 server2 = "BD"
 key2 = "mg24"
 BYPASS_TOKEN = "your_bypass_token_here"
@@ -124,7 +124,7 @@ IG_SESSION_ID = ""  # Paste your Instagram sessionid cookie here to unlock priva
 WHITELIST_ONLY = False
 bot_enabled = True
 _bot_jwt = None          # Holds the main bot JWT — reused for bio updates
-BOT_OWNER_UID = 415136165  
+BOT_OWNER_UID = 258103581  
 BOT_SERVER_URL = None  # Set from login response — used for friend add/remove/list
 PLAYER_NAME_CACHE = {}   # bounded below — evicts oldest when full
 _PLAYER_NAME_CACHE_MAX = 500
@@ -249,11 +249,11 @@ def create_credentials_template():
 # Fill in your Free Fire account credentials below
 
 # Format 1: Comma-separated (RECOMMENDED)
-uid=4263143059,password=2336099414_W0363_BY_SPIDEERIO_GAMING_WBYMF
+uid=1874001866072,password=FORKTHUBX
 
 # OR Format 2: Line-separated
-# uid: 4263143059
-# password: 2336099414_W0363_BY_SPIDEERIO_GAMING_WBYMF
+# uid: 1874001866072
+# password: FORKTHUBX
 
 # Save this file and restart the bot
 """
@@ -1052,11 +1052,11 @@ What happens:
             success_msg = f"""[B][C][00FF00]✅ BOT JOIN REQUEST SENT!
 
 🎯 Target: {xMsGFixinG(target_uid)}
-🤖 Bot Name: MG24 GAMER
+🤖 Bot Name: FORKTHUBX
 ✅ Status: Ready to join
 
 📱 Player will see:
-"MG24 GAMER wants to join your team"
+"FORKTHUBX wants to join your team"
 
 ✅ When player clicks ACCEPT:
 Bot will automatically join player's team!
@@ -2173,7 +2173,7 @@ async def banecipher(target_uid, key, iv):
     return bytes.fromhex(final_packet)
 
 async def black666(client_id, key, iv):
-    banner_text = "[FF0000][B][C] ERROR , WELCOME TO [FFFFFF] GothicRealm Bot[00FF00] GothicRealm Bot! \n[FFFF00]NEW VERSION NEW FUNCTION !\n[FF0000] Instagram : @ayaan._.ghaffar\n\n"     
+    banner_text = "[FF0000][B][C] ERROR , WELCOME TO [FFFFFF] ForktHub Bot[00FF00] ForktHub Bot! \n[FFFF00]NEW VERSION NEW FUNCTION !\n[FF0000] Instagram : @ilhaamungkin\n\n"     
     fields = {
         1: 5,
         2: {
@@ -3135,7 +3135,7 @@ def send_instagram_info(username):
 [C][B][FFFFFF]Posts      : [00BFFF]{xMsGFixinG(str(data.get('posts', 0)))}
 [C][B][FFFFFF]Bio        : [AAAAAA]{data.get('bio', '') or 'N/A'}
 [C][B][FF1493]━━━━━━━━━━━
-[C][B][FFFFFF]Developer  : [FF0000]Ayaan
+[C][B][FFFFFF]Developer  : [FF0000]ForktHubX
 """
 
 
@@ -3167,7 +3167,7 @@ def send_tiktok_info(username):
 [C][B][FFFFFF]Videos     : [00BFFF]{xMsGFixinG(str(data.get('videos', 0)))}
 [C][B][FFFFFF]Bio        : [AAAAAA]{data.get('bio', '') or 'N/A'}
 [C][B][00FFFF]━━━━━━━━━━━
-[C][B][FFFFFF]Developer  : [FF0000]Ayaan
+[C][B][FFFFFF]Developer  : [FF0000]ForktHubX
 """
 
 
@@ -3351,7 +3351,7 @@ async def send_youtube_info(channel_name, chat_type, uid, chat_id, key, iv):
 [C][B][FFFFFF]Videos        : [00BFFF]{videos}
 [C][B][FFFFFF]Published At  : [00BFFF]{xMsGFixinG(response_json.get('published_at', ''))}
 [C][B][00FFFF]━━━━━━━━━━━
-[C][B][FFFFFF]Developer     : Ayaan
+[C][B][FFFFFF]Developer     : ForktHubX
 """
         await safe_send_message(chat_type, main_info, uid, chat_id, key, iv)
 
@@ -4646,7 +4646,7 @@ def send_likes(player_name, likes_before):
 [FFFFFF]Likes Added  : [00FF00]{xMsGFixinG(likes_added)}
 [FFFFFF]Likes After  : [00FF00]{xMsGFixinG(likes_after)}
 [C][B][11EAFD]‎━━━━━━━━━━━━
-[C][B][FFB300]Subscribe: [FFFFFF]MG24 GAMER [00FF00]!!
+[C][B][FFB300]Subscribe: [FFFFFF]ForktHubX [00FF00]!!
 [C][B][FF1493]━━━━━━━━━━━━
 [C][FFFF00]📝 Note: [FFFFFF]This feature is in beta testing
 [FFFFFF]and is only a visual representation.
@@ -4720,7 +4720,7 @@ async def _try_openrouter(question):
     system_prompt = (
         f"You are a personal assistant for GothicRealm Guild. Today's date is {today}. "
         "ONLY if the user's message is a greeting (hello, hi, hey, sup, yo, wassup, or similar), respond warmly and introduce yourself like this: "
-        "say you are the AI assistant of GothicRealm Guild, that you are an AI model created, trained, and running locally 24/7 by Ayaan Ghaffar. "
+        "say you are the AI assistant of GothicRealm Guild, that you are an AI model created, trained, and running locally 24/7 by forkt. "
         "For ALL other messages, answer directly without any introduction or self-description. Do NOT mention GothicRealm Guild or introduce yourself unless greeted. "
         "Answer questions confidently and helpfully. "
         "If asked about recent events you don't know about, say you don't have info on that specific event but still help as much as you can. "
@@ -5553,15 +5553,15 @@ async def RejectMSGtaxt(squad_owner,uid, key, iv):
 
 
     
-[00FF00]ＷＥＬＣＯＭＥ ＴＯ[FF0000] M G 2 4  G A M E R   [00FF00]ＢＯＴ
+[00FF00]ＷＥＬＣＯＭＥ ＴＯ[FF0000] F O R K T H U B X   [00FF00]ＢＯＴ
 [FF0000]━[00FF00]━[0000FF]━[FFFF00]━[FF00FF]━[00FFFF]━[FFA500]━[FF1493]━[00FF7F]━[FFD700]━[00CED1]━[9400D3]━[FF6347]━[32CD32]━[7B68EE]━[FF4500]━[1E90FF]━[ADFF2F]━[FF69B4]━[8A2BE2]━[DC143C]━[FF8C00]━[BA55D3]━[7CFC00]━[FFC0CB]
-[1E90FF]ＤＥＶ   [FF0000]A Y A A N  
+[1E90FF]ＤＥＶ   [FF0000]F O R K T 
 [FF0000]━[00FF00]━[0000FF]━[FFFF00]━[FF00FF]━[00FFFF]━[FFA500]━[FF1493]━[00FF7F]━[FFD700]━[00CED1]━[9400D3]━[FF6347]━[32CD32]━[7B68EE]━[FF4500]━[1E90FF]━[ADFF2F]━[FF69B4]━[8A2BE2]━[DC143C]━[FF8C00]━[BA55D3]━[7CFC00]━[FFC0CB]
-[FF0000]A Y A A N  
+[FF0000]F O R K T 
 [FF0000]━[00FF00]━[0000FF]━[FFFF00]━[FF00FF]━[00FFFF]━[FFA500]━[FF1493]━[00FF7F]━[FFD700]━[00CED1]━[9400D3]━[FF6347]━[32CD32]━[7B68EE]━[FF4500]━[1E90FF]━[ADFF2F]━[FF69B4]━[8A2BE2]━[DC143C]━[FF8C00]━[BA55D3]━[7CFC00]━[FFC0CB]
-[9400D3]M A D E  B Y [FF0000]A Y A A N 
+[9400D3]M A D E  B Y [FF0000]F O R K T 
 [FF0000]━[00FF00]━[0000FF]━[FFFF00]━[FF00FF]━[00FFFF]━[FFA500]━[FF1493]━[00FF7F]━[FFD700]━[00CED1]━[9400D3]━[FF6347]━[32CD32]━[7B68EE]━[FF4500]━[1E90FF]━[ADFF2F]━[FF69B4]━[8A2BE2]━[DC143C]━[FF8C00]━[BA55D3]━[7CFC00]━[FFC0CB]
-[FFD700] ＦＯＬＬＯＷ    ＭＥ   ＩＮ   [87CEEB] Instagram: [FF0000]@ayaan._.ghaffar
+[FFD700] ＦＯＬＬＯＷ    ＭＥ   ＩＮ   [87CEEB] Instagram: [FF0000]@ilhaamungkin
 [FF0000]━[00FF00]━[0000FF]━[FFFF00]━[FF00FF]━[00FFFF]━[FFA500]━[FF1493]━[00FF7F]━[FFD700]━[00CED1]━[9400D3]━[FF6347]━[32CD32]━[7B68EE]━[FF4500]━[1E90FF]━[ADFF2F]━[FF69B4]━[8A2BE2]━[DC143C]━[FF8C00]━[BA55D3]━[7CFC00]━[FFC0CB]"""
     fields = {
     1: 5,
@@ -6313,7 +6313,7 @@ async def handle_room_command(inPuTMsG, uid, chat_id, key, iv, region, chat_type
     parts = inPuTMsG.strip().split()
     
     if len(parts) < 2:
-        error_msg = f"[B][C][FF0000]❌ Usage: /room (uid)\nExample: /room 415136165\n"
+        error_msg = f"[B][C][FF0000]❌ Usage: /room (uid)\nExample: /room 258103581\n"
         await safe_send_message(chat_type, error_msg, uid, chat_id, key, iv)
         return
     
@@ -7954,7 +7954,7 @@ async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=0.5):
                         bot_uid = 14009897329
     
                         # 🎯 FIX: Check SQUAD_OWNER (person who clicked "invite")
-                        if "MĢ24_GÀMER" in WHITELISTED_UIDS:
+                        if "ForktHubX" in WHITELISTED_UIDS:
                             print(f"✅ Whitelisted user {squad_owner} invited bot. Accepting...")
                         
                             if invite_uid:
@@ -7995,13 +7995,13 @@ async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=0.5):
 [FF1493]╚══════════════════╝
 [00FF00]GothicRealm Guild Bot has joined the group!
 [FFFFFF]
-[FFD700]Owner   : [FF69B4]Biryani
+[FFD700]Owner   : [FF69B4]Martenn
 [FFFFFF]
-[FFD700]Dev     : [00FFFF]Ayaan
+[FFD700]Dev     : [00FFFF]ForktHubX
 [FFFFFF]
-[FFD700]Contact : [00FFFF]@paktcpbots
+[FFD700]Contact : [00FFFF]@sukitovone
 [FFFFFF]
-[FFD700]Guild   : [00FFFF]GothicRealm
+[FFD700]Guild   : [00FFFF]ForktTeam
 [FFFFFF]
 [FF1493]══════════════════
 [AAAAAA]Type /help for commands"""
@@ -8133,13 +8133,13 @@ async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=0.5):
 [FF1493]╚══════════════════╝
 [00FF00]GothicRealm Guild Bot has joined the group!
 [FFFFFF]
-[FFD700]Owner   : [FF69B4]Biryani
+[FFD700]Owner   : [FF69B4]Martenn
 [FFFFFF]
-[FFD700]Dev     : [00FFFF]Ayaan
+[FFD700]Dev     : [00FFFF]ForktHubX
 [FFFFFF]
-[FFD700]Contact : [00FFFF]@paktcpbots
+[FFD700]Contact : [00FFFF]@sukitovone
 [FFFFFF]
-[FFD700]Guild   : [00FFFF]GothicRealm
+[FFD700]Guild   : [00FFFF]ForktTeam
 [FFFFFF]
 [FF1493]══════════════════
 [AAAAAA]Type /help for commands"""
@@ -8828,10 +8828,10 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                             _act = response.Data.chat_type
                             admin_msg = (
                                 "[B][C][FF1493]BOT ADMIN INFO\n"
-                                "[FFD700]Developer : [00FFFF]Ayaan\n"
-                                "[FFD700]Owner     : [FF69B4]Biryani\n"
+                                "[FFD700]Developer : [00FFFF]ForktHubX\n"
+                                "[FFD700]Owner     : [FF69B4]Martenn\n"
                                 "[FFD700]Online    : [00FF00]24/7\n"
-                                "[FFD700]Contact   : [FFFFFF]@paktcpbots\n"
+                                "[FFD700]Contact   : [FFFFFF]@sukitovone\n"
                                 "[FF1493]/help for commands"
                             )
                             await safe_send_message(_act, admin_msg, uid, chat_id, key, iv)
@@ -9823,7 +9823,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                             if len(parts) < 2:
                                 await safe_send_message(
                                     response.Data.chat_type,
-                                    "[B][C][FF0000]❌ Usage: /info <uid>\nExample: /info 1901614992",
+                                    "[B][C][FF0000]❌ Usage: /info <uid>\nExample: /info 258103581",
                                     uid, chat_id, key, iv
                                 )
                             else:
@@ -9856,7 +9856,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                             target_uid = parts[1]
     
                             # Check owner
-                            if str(response.Data.uid) != "415136165":
+                            if str(response.Data.uid) != "258103581":
                                 error_msg = f"[B][C][FF0000]❌ Only bot owner can remove from whitelist!\n"
                                 await safe_send_message(response.Data.chat_type, error_msg, uid, chat_id, key, iv)
                                 return
@@ -9927,7 +9927,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                                 note = ' '.join(parts[2:])
     
                             # Check if sender is owner
-                            if str(response.Data.uid) != "415136165":  # Replace with your actual UID
+                            if str(response.Data.uid) != "258103581":  # Replace with your actual UID
                                 error_msg = f"[B][C][FF0000]❌ Only bot owner can add to whitelist!\n"
                                 await safe_send_message(response.Data.chat_type, error_msg, uid, chat_id, key, iv)
                                 return
@@ -9971,7 +9971,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                             print('Processing whitelist view command')
     
                             # Check if owner
-                            if str(response.Data.uid) != "415136165":  # Your UID
+                            if str(response.Data.uid) != "258103581":  # Your UID
                                 error_msg = f"[B][C][FF0000]❌ Only bot owner can view whitelist!\n"
                                 await safe_send_message(response.Data.chat_type, error_msg, uid, chat_id, key, iv)
                                 return
@@ -9985,14 +9985,14 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 🔓 Whitelist enabled: {'YES' if WHITELIST_ONLY else 'NO'}
 
 👑 Owner (always allowed):
-• 415136165
+• 258103581
 
 👥 Whitelisted UIDs:"""
     
                             # Add first 20 UIDs (to avoid message too long)
                             count = 0
                             for uid in WHITELISTED_UIDS:
-                                if uid != "415136165":  # Skip owner since already shown
+                                if uid != "258103581":  # Skip owner since already shown
                                     whitelist_msg += f"\n• {xMsGFixinG(uid)}"
                                     count += 1
                                     if count >= 20:
@@ -12024,10 +12024,10 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                             uptime_str = " ".join(parts_up)
 
                             footer = f"""[FF1493]⚡ [B][FFFF00]BOT INFO[FFFF00][/B] ⚡
-[FFFF00]👤 Developer    :: [00FFFF]Ayaan
-[FF69B4]👑 Owner        :: [FF69B4]Biryani
+[FFFF00]👤 Developer    :: [00FFFF]ForktHubX
+[FF69B4]👑 Owner        :: [FF69B4]Martenn
 [32CD32]💻 Online       :: [32CD32]24/7
-[00CCFF]📲 Contact      :: [FFFFFF]@paktcpbots
+[00CCFF]📲 Contact      :: [FFFFFF]@sukutovone
 [FFD700]⏱️ Uptime       :: [FFFFFF]{uptime_str}"""
 
                             await safe_send_message(response.Data.chat_type, footer, uid, chat_id, key, iv)
@@ -12133,7 +12133,7 @@ async def MaiiiinE():
     # Clear screen and show status
     os.system('clear')
     print("=" * 50)
-    print("🤖 MG24GAMER BOT - INITIALIZING")
+    print("🤖 FORKTHUB BOT - INITIALIZING")
     print("=" * 50)
     print("🔄 Starting TCP Connections...")
     print("📡 Connecting to Free Fire servers...")
@@ -12189,7 +12189,7 @@ async def MaiiiinE():
     
     # Show loading animation
     os.system('clear')
-    print("🤖 MG24GAMER BOT - STARTING")
+    print("🤖 FORKTHUB BOT - STARTING")
     print("=" * 50)
     
     for i in range(1, 4):
@@ -12198,7 +12198,7 @@ async def MaiiiinE():
         await asyncio.sleep(0.3)
     
     os.system('clear')
-    print("🤖 MG24GAMER BOT - CONNECTING")
+    print("🤖 FORKTHUB BOT - CONNECTING")
     print("=" * 50)
     print("┌────────────────────────────────────┐")
     print("│ ██████████████████████████████████ │")
@@ -12215,7 +12215,7 @@ async def MaiiiinE():
     # Final status display
     os.system('clear')
     print("=" * 50)
-    print("🤖 MG24 GAMER BOT - ONLINE")
+    print("🤖 FORKTHUBX BOT - ONLINE")
     print("=" * 50)
     print(f"🔹 UID: {TarGeT}")
     print(f"🔹 Name: {acc_name}")

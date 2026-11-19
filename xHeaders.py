@@ -146,7 +146,7 @@ def GeT_PLayer_InFo(uid , Token):
  Creating : {account_date}
  LasT LoGin : {last_login}
  
-  [90EE90]Dev : BLACK_APIs\n'''            
+  [90EE90]Dev : ForktHubX\n'''            
                 a = a.replace('[i]','')
                 return a
                                                     
