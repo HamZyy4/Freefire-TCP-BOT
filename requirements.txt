@@ -10,3 +10,4 @@ cfonts
 pycryptodome
 phonenumbers
 dnspython
+flask
