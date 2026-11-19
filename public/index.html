@@ -1,1 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel TCP Bot</title>
+<style>
+:root{--bg:#e8edf1;--card:#f8fafb;--ink:#13233a;--mute:#5d6b7c;--line:#cfd7de;--go:#1f9d63;--stop:#d3402f;--hot:#f59e0b;--term:#0f1b2d;--termink:#c9d6e6;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-t=l]){--bg:#0c1624;--card:#142238;--ink:#e6edf6;--mute:#8fa1b6;--line:#243651;--term:#08111d;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px 40px}
+main{max-width:760px;margin:0 auto;display:grid;gap:16px}
+h1{font-size:1.4rem;margin:8px 0 0;letter-spacing:-.01em}
+h2{font-size:1rem;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+button,input,textarea{font:inherit;color:inherit}
+button{border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--ink);color:var(--bg)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+.go{background:var(--go);color:#fff}.stop{background:var(--stop);color:#fff}.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.state{display:flex;align-items:center;gap:14px}
+.lamp{width:18px;height:18px;border-radius:50%;background:var(--mute);flex:none}
+.lamp.on{background:var(--go);box-shadow:0 0 0 6px color-mix(in srgb,var(--go) 25%,transparent)}
+.lamp.off{background:var(--stop)}
+.big{font-size:1.8rem;font-weight:700;line-height:1.1}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+pre{margin:0;background:var(--term);color:var(--termink);border-radius:8px;padding:12px;height:280px;overflow:auto;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+textarea{height:220px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+.msg{min-height:1.4em;color:var(--mute);font-size:.9rem;margin-top:8px}
+.msg.err{color:var(--stop)}
+#login{max-width:360px;margin:20vh auto 0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.lamp{transition:background .2s,box-shadow .2s}}
+</style>
+</head>
+<body>
+<section id="login" class="card">
+  <h1>Panel TCP Bot</h1>
+  <p class="msg">Masukkan password panel untuk melanjutkan.</p>
+  <label for="pw" style="font-size:.9rem">Password panel</label>
+  <input id="pw" type="password" autocomplete="current-password">
+  <div class="row"><button id="enter">Masuk</button></div>
+  <div class="msg err" id="lerr" role="alert"></div>
+</section>
 
+<main id="app" hidden>
+  <h1>Panel TCP Bot</h1>
+  <section class="card">
+    <div class="state"><span class="lamp" id="lamp"></span>
+      <div><div class="big" id="st">Memeriksa…</div><div class="msg" id="pid" style="margin:0"></div></div></div>
+    <div class="row">
+      <button class="go" id="bStart">Jalankan bot</button>
+      <button class="ghost" id="bRestart">Mulai ulang</button>
+      <button class="stop" id="bStop">Hentikan bot</button>
+    </div>
+    <div class="msg" id="amsg" role="status"></div>
+  </section>
+
+  <section class="card">
+    <h2>Log bot</h2>
+    <pre id="log" tabindex="0" aria-live="off">Belum ada log.</pre>
+  </section>
+
+  <section class="card">
+    <h2>Daftar emote (emotes.json)</h2>
+    <textarea id="emo" spellcheck="false" aria-label="Isi emotes.json"></textarea>
+    <div class="row"><button id="bSave">Simpan emote</button><button class="ghost" id="bOut">Keluar</button></div>
+    <div class="msg" id="emsg" role="status"></div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let pw = sessionStorage.getItem('pw') || '';
+
+async function api(p, method = 'GET', body) {
+  const r = await fetch('/api/bot?p=' + p, {
+    method,
+    headers: { 'content-type': 'application/json', 'x-panel-password': pw },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(j.error || 'Permintaan gagal'), { code: r.status });
+  return j;
+}
+function say(el, t, err) { el.textContent = t; el.className = 'msg' + (err ? ' err' : ''); }
+
+async function refresh() {
+  try {
+    const s = await api('status');
+    $('lamp').className = 'lamp ' + (s.running ? 'on' : 'off');
+    $('st').textContent = s.running ? 'Bot berjalan' : 'Bot berhenti';
+    $('pid').textContent = s.running ? 'PID ' + s.pid : '';
+    $('bStart').disabled = s.running; $('bStop').disabled = !s.running;
+    const l = await api('logs'), box = $('log');
+    const atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 30;
+    box.textContent = l.lines.length ? l.lines.join('\n') : 'Belum ada log.';
+    if (atEnd) box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    if (e.code === 401) return logout();
+    $('lamp').className = 'lamp'; $('st').textContent = 'Server bot tidak terjangkau';
+    $('pid').textContent = e.message;
+  }
+}
+async function act(p, label) {
+  say($('amsg'), label + '…');
+  try { await api(p, 'POST', {}); say($('amsg'), label + ' berhasil'); } catch (e) { say($('amsg'), e.message, true); }
+  refresh();
+}
+async function loadEmotes() {
+  try { $('emo').value = JSON.stringify((await api('emotes')).data, null, 2); }
+  catch (e) { say($('emsg'), e.message, true); }
+}
+$('bSave').onclick = async () => {
+  let data; try { data = JSON.parse($('emo').value); } catch { return say($('emsg'), 'JSON tidak valid. Periksa koma dan tanda kutip.', true); }
+  try { await api('emotes', 'PUT', { data }); say($('emsg'), 'Emote disimpan'); } catch (e) { say($('emsg'), e.message, true); }
+};
+$('bStart').onclick = () => act('start', 'Menjalankan bot');
+$('bStop').onclick = () => act('stop', 'Menghentikan bot');
+$('bRestart').onclick = () => act('restart', 'Memulai ulang bot');
+
+let timer;
+function show() { $('login').hidden = true; $('app').hidden = false; refresh(); loadEmotes(); timer = setInterval(refresh, 3000); }
+function logout() { clearInterval(timer); sessionStorage.removeItem('pw'); pw = ''; $('app').hidden = true; $('login').hidden = false; }
+$('bOut').onclick = logout;
+$('enter').onclick = async () => {
+  pw = $('pw').value;
+  try { await api('status'); sessionStorage.setItem('pw', pw); say($('lerr'), ''); show(); }
+  catch (e) { say($('lerr'), e.code === 401 ? 'Password salah.' : e.message, true); }
+};
+$('pw').addEventListener('keydown', e => e.key === 'Enter' && $('enter').click());
+if (pw) api('status').then(show).catch(logout);
+</script>
+</body>
+</html>
