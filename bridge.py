@@ -3,13 +3,17 @@ Taruh file ini di folder yang sama dengan main.py, lalu jalankan di VPS/Railway/
     pip install flask
     BOT_API_KEY=rahasia123 python bridge.py
 """
-import os, sys, json, subprocess, threading, collections
+import os, re, sys, json, subprocess, threading, collections
 from flask import Flask, request, jsonify
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 KEY = os.environ["BOT_API_KEY"]
 EMOTES = os.path.join(DIR, "emotes.json")
-logs = collections.deque(maxlen=500)
+
+BOOT = os.urandom(4).hex()          # berubah setiap bridge dijalankan ulang
+logs = collections.deque(maxlen=1000)
+count = 0                            # total baris yang pernah ditulis (tidak pernah mundur)
+lock = threading.Lock()
 proc = None
 app = Flask(__name__)
 
@@ -20,10 +24,17 @@ def auth():
         return jsonify(error="API key salah"), 401
 
 
+def add(line):
+    global count
+    with lock:
+        logs.append(line)
+        count += 1
+
+
 def pump(p):
     for line in p.stdout:
-        logs.append(line.rstrip())
-    logs.append("[panel] proses berhenti")
+        add(line.rstrip())
+    add("[panel] proses berhenti")
 
 
 def running():
@@ -35,9 +46,10 @@ def start():
     if running():
         return
     proc = subprocess.Popen([sys.executable, "-u", "main.py"], cwd=DIR,
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                            bufsize=1, errors="replace")
     threading.Thread(target=pump, args=(proc,), daemon=True).start()
-    logs.append("[panel] bot dijalankan")
+    add("[panel] bot dijalankan")
 
 
 def stop():
@@ -56,7 +68,18 @@ def status():
 
 @app.get("/logs")
 def get_logs():
-    return jsonify(lines=list(logs))
+    # first = nomor urut baris pertama yang dikirim; client memakainya agar "hapus log"
+    # tetap benar walau buffer penuh atau halaman dimuat ulang.
+    with lock:
+        lines = list(logs)
+        return jsonify(lines=lines, first=count - len(lines), count=count, boot=BOOT)
+
+
+@app.post("/clear")
+def r_clear():
+    with lock:
+        logs.clear()
+        return jsonify(ok=True, count=count)
 
 
 @app.post("/start")
@@ -90,5 +113,17 @@ def put_emotes():
     return jsonify(ok=True)
 
 
+@app.get("/commands")
+def commands():
+    """Pindai main.py dan kembalikan semua string perintah (/xxx atau !x) yang ada di kode."""
+    try:
+        with open(os.path.join(DIR, "main.py"), encoding="utf-8", errors="ignore") as f:
+            src = f.read()
+    except OSError:
+        return jsonify(commands=[])
+    found = sorted(set(re.findall(r"""["']([/!][a-z][a-z0-9_]{0,19})(?=[\s"'])""", src)))
+    return jsonify(commands=found)
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), threaded=True)
