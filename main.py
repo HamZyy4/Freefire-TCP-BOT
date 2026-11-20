@@ -15,6 +15,14 @@ import random
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
+def _clear():
+    """Bersihkan layar hanya di terminal interaktif (di Railway/panel tidak perlu)."""
+    try:
+        if os.isatty(1):
+            os.system('clear')
+    except Exception:
+        pass
+
 # ── auto-install phonenumbers if missing ──
 try:
     import phonenumbers
@@ -115,11 +123,11 @@ _console_squad_chat_id = None   # Squad/group chat ID
 _console_chat_target = "group"  # "guild" or "group" — which chat console sends to
 server2 = "ID"
 key2 = "mg24"
-BYPASS_TOKEN = "your_bypass_token_here"
-YOUTUBE_API_KEY = "AIzaSyBVP3NiKKJvb-0ar2J3y9IFVVHHWRng4nA"
-GEMINI_AI_API_KEY = "AIzaSyADPE-gPODMslNB6AElglDtBRv6PQDVChY"
-GROQ_AI_API_KEY = None
-OPENROUTER_AI_API_KEY = "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"
+BYPASS_TOKEN = os.getenv("BYPASS_TOKEN", "")
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
+GEMINI_AI_API_KEY = os.getenv("GEMINI_AI_API_KEY", "")
+GROQ_AI_API_KEY = os.getenv("GROQ_AI_API_KEY") or None
+OPENROUTER_AI_API_KEY = os.getenv("OPENROUTER_AI_API_KEY") or None
 IG_SESSION_ID = ""  # Paste your Instagram sessionid cookie here to unlock private account stats
 WHITELIST_ONLY = False
 bot_enabled = True
@@ -591,7 +599,7 @@ async def get_player_info(uid):
             "AccountLikes":              _mg(d, "liked", "likes", "AccountLikes", default="0"),
             "AccountRegion":             _mg(d, "region", "AccountRegion", default="N/A"),
             "AccountBPID":               _mg(d, "bannerId", "badgeId", "AccountBPID", "bpId", default="N/A"),
-            "ReleaseVersion":            _mg(d, "version", "ReleaseVersion", "releaseVersion", default="OB53"),
+            "ReleaseVersion":            _mg(d, "version", "ReleaseVersion", "releaseVersion", default="OB55"),
             "AccountCreateTime":         _ts(d, "createdAt", "createTime", "AccountCreateTime", "create_time", "created_at"),
             "AccountLastLogin":          _ts(d, "lastLoginAt", "lastLogin", "AccountLastLogin", "last_login"),
             "AccountLastLoginFormatted": "",
@@ -679,7 +687,7 @@ async def get_player_likes_internal(uid, region="bd"):
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -796,7 +804,7 @@ def send_friend_request_single(uid, token, region="PK"):
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -846,52 +854,44 @@ def start_autooo(self):
         print(e)
 
 def load_credentials_from_file(filename="MG24GAMER.txt"):
-    """
-    Load UID and password from MG24GAMER.txt file
-    """
-    try:
-        if not os.path.exists(filename):
-            print(f"❌ {filename} not found!")
-            create_credentials_template()
+    """Ambil UID/password: environment (FF_UID, FF_PASSWORD) dulu, lalu file.
+    Mengembalikan (None, None) bila tidak ada / masih berisi contoh template."""
+    PLACEHOLDER_UIDS = {"1874001866072"}
+    PLACEHOLDER_PW = {"xxxx", "your_password", "password"}
+
+    uid = (os.getenv("FF_UID") or "").strip()
+    password = (os.getenv("FF_PASSWORD") or "").strip()
+    source = "environment"
+
+    if not (uid and password):
+        source = filename
+        try:
+            if not os.path.exists(filename):
+                print(f"❌ {filename} not found!")
+                create_credentials_template()
+                return None, None
+            with open(filename, 'r', encoding='utf-8') as f:
+                content = f.read()
+            m_uid = re.search(r'uid\s*[=:]\s*(\d+)', content, re.IGNORECASE)
+            m_pw = re.search(r'password\s*[=:]\s*([^\s,]+)', content, re.IGNORECASE)
+            uid = m_uid.group(1) if m_uid else ""
+            password = m_pw.group(1) if m_pw else ""
+        except Exception as e:
+            print(f"❌ Error loading credentials: {e}")
             return None, None
-        
-        with open(filename, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        uid = None
-        password = None
-        
-        # Try to find uid and password using regex
-        import re
-        
-        # Look for uid=value or uid: value
-        uid_match = re.search(r'(?:uid\s*[=:]\s*)(\d+)', content, re.IGNORECASE)
-        if uid_match:
-            uid = uid_match.group(1)
-        
-        # Look for password=value or password: value
-        pass_match = re.search(r'(?:password\s*[=:]\s*)([^\s\n\r]+)', content, re.IGNORECASE)
-        if pass_match:
-            password = pass_match.group(1)
-        
-        if not uid or not password:
-            print(f"❌ Could not find UID/password in {filename}")
-            print("📝 Please make sure the file contains:")
-            print("   uid=YOUR_UID,password=YOUR_PASSWORD")
-            print("   OR")
-            print("   uid: YOUR_UID")
-            print("   password: YOUR_PASSWORD")
-            return None, None
-        
-        print(f"✅ Loaded credentials from {filename}")
-        print(f"👤 UID: {uid}")
-        print(f"🔑 Password: {password}")
-        
-        return uid, password
-        
-    except Exception as e:
-        print(f"❌ Error loading credentials: {e}")
+
+    if not uid or not password:
+        print(f"❌ Could not find UID/password in {source}")
+        print("📝 Format file: uid=YOUR_UID,password=YOUR_PASSWORD")
         return None, None
+    if uid in PLACEHOLDER_UIDS or password.lower() in PLACEHOLDER_PW:
+        print(f"❌ {source} masih berisi contoh template. Isi dengan UID/password akun guest kamu.")
+        return None, None
+
+    print(f"✅ Loaded credentials from {source}")
+    print(f"👤 UID: {uid}")
+    print(f"🔑 Password: {'*' * 8} ({len(password)} karakter)")
+    return uid, password
 
 # Load emotes from JSON file (your format)
 def load_emotes_from_json():
@@ -1593,15 +1593,17 @@ async def cache_consumer():
 
 
 # Start consumer in your main function
+_last_garena_status = 0
+
 async def StarTinG():
-    # Start long-lived background workers once
     consumer_task = asyncio.create_task(cache_consumer())
     sweeper_task  = asyncio.create_task(_cache_sweeper())
+    fails = 0
 
     while True:
-        # Clear accumulated state before every (re)start so memory doesn't grow across cycles
         _mem_cache.clear()
         cache_dict.clear()
+        started = time.time()
 
         try:
             await asyncio.wait_for(MaiiiinE(), timeout=7 * 60 * 60)
@@ -1613,6 +1615,17 @@ async def StarTinG():
             print("Token ExpiRed ! , ResTartinG")
         except Exception as e:
             print(f"ErroR TcP - {e} => ResTarTinG ...")
+
+        # Jeda sebelum login ulang: makin sering gagal, makin lama
+        if time.time() - started > 300:
+            fails, delay = 0, 5          # sesi tadi sempat jalan lama, restart normal
+        else:
+            fails += 1
+            delay = min(60 * (2 ** (fails - 1)), 1800)   # 60s, 120s, 240s ... maks 30 menit
+            if _last_garena_status == 429:
+                delay = max(delay, 900)                  # kena batas Garena: tunggu min. 15 menit
+        print(f"⏳ Login berhenti ({fails}x berturut-turut). Coba lagi dalam {delay} detik...")
+        await asyncio.sleep(delay)
 
 # ── In-memory TTL cache (replaces slow pickle file I/O) ──
 CACHE_TIMEOUT = 30  # seconds before a cache entry expires
@@ -3572,7 +3585,7 @@ def send_guild_info(guild_id):
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; SM-A515F Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -3741,7 +3754,7 @@ def search_guild_by_name(clan_name):
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/x-www-form-urlencoded",
             "X-Unity-Version": "2018.4.11f1",
-            "ReleaseVersion": "OB52",
+            "ReleaseVersion": "OB55",
             "X-GA": "v1 1",
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 7.1.2; SM-G998B Build/SP1A.210812.016)",
             "Host": "clientbp.ggpolarbear.com",
@@ -3903,7 +3916,7 @@ def leave_guild():
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -4004,7 +4017,7 @@ def send_guild_join_request(guild_id):
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -4135,7 +4148,7 @@ def remove_friend(target_uid):
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Connection": "Keep-Alive",
             "Accept-Encoding": "gzip",
         }
@@ -4194,7 +4207,7 @@ def get_friend_list():
             "Authorization": f"Bearer {token}",
             "X-Unity-Version": "2018.4.11f1",
             "X-GA": "v1 1",
-            "ReleaseVersion": "OB53",
+            "ReleaseVersion": "OB55",
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
             "Connection": "Keep-Alive",
@@ -4829,7 +4842,7 @@ Hr = {
     'Expect': "100-continue",
     'X-Unity-Version': "2018.4.11f1",
     'X-GA': "v1 1",
-    'ReleaseVersion': "OB53"}
+    'ReleaseVersion': "OB55"}
 
 # ---- Random Colores ----
 def get_random_color():
@@ -4974,6 +4987,7 @@ async def encrypted_proto(encoded_hex):
     return encrypted_payload
     
 async def GeNeRaTeAccEss(uid , password):
+    global _last_garena_status          # ← tambahkan ini
     url = "https://100067.connect.garena.com/oauth/guest/token/grant"
     headers = {
         "Host": "100067.connect.garena.com",
@@ -4993,6 +5007,7 @@ async def GeNeRaTeAccEss(uid , password):
         async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.post(url, headers=headers, data=data) as response:
                 body = await response.text()
+                _last_garena_status = response.status 
                 print(f"🔎 Garena status={response.status} | body={body[:300]}")
                 if response.status != 200: return (None, None)
                 try:
@@ -5012,7 +5027,7 @@ async def EncRypTMajoRLoGin(open_id, access_token):
     major_login.event_time = str(datetime.now())[:-7]
     major_login.game_name = "free fire"
     major_login.platform_id = 1
-    major_login.client_version = "1.123.1"
+    major_login.client_version = "1.132.1"
     major_login.system_software = "Android OS 9 / API-28 (PQ3B.190801.10101846/G9650ZHU2ARC6)"
     major_login.system_hardware = "Handheld"
     major_login.telecom_operator = "Verizon"
@@ -5489,7 +5504,7 @@ async def send_required_packets(key, iv, region, bot_uid):
             1: 100,
             2: {
                 1: bot_uid,
-                2: "1.123.1",  # Game version
+                2: "1.132.1",  # Game version
                 3: "Android",
                 4: "en",
             }
@@ -6739,7 +6754,7 @@ import asyncio
 # Add these constants with your other global variables
 BIO_ENCRYPTION_KEY = bytes([89, 103, 38, 116, 99, 37, 68, 69, 117, 104, 54, 37, 90, 99, 94, 56])
 BIO_ENCRYPTION_IV = bytes([54, 111, 121, 90, 68, 114, 50, 50, 69, 51, 121, 99, 104, 106, 77, 37])
-FREEFIRE_VERSION = "OB53"
+FREEFIRE_VERSION = "OB55"
 
 def decode_jwt_noverify(token: str):
     """Decode JWT without verification"""
@@ -7249,7 +7264,7 @@ async def RedZed_SendInv(bot_uid, uid, key, iv):
                     2: 159, 
                     4: "y[WW", 
                     6: 11, 
-                    8: "1.123.1", 
+                    8: "1.132.1", 
                     9: 3, 
                     10: 1
                 }, 
@@ -7813,7 +7828,9 @@ async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=0.5):
     online_writer = None
     whisper_writer = None
     
+    _fail = 0
     while True:
+        _t0 = time.time()
         try:
             print(f"Attempting to connect to {ip}:{port}...")
             reader, writer = await asyncio.open_connection(ip, int(port))
@@ -8348,7 +8365,10 @@ async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=0.5):
             squad_group_owner_uid = None
             squad_group_chat_code = None
             
-        await asyncio.sleep(reconnect_delay)
+        _fail = 0 if time.time() - _t0 > 30 else min(_fail + 1, 6)
+        _wait = min(reconnect_delay * (2 ** _fail), 30) + random.random()
+        print(f"🔁 Reconnect dalam {_wait:.1f} detik (gagal beruntun: {_fail})")
+        await asyncio.sleep(_wait)
         
                     
 
@@ -8367,7 +8387,9 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
     # At the VERY TOP of your file, with other globals:
     status_response_cache = {}
     cache_lock = asyncio.Lock()  # For thread safety
+    _fail = 0
     while True:
+        _t0 = time.time()
         try:
             # Reset reconnect/failure flags for each fresh connection
             global _chat_force_reconnect, _send_fail_count
@@ -9151,7 +9173,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
                                             # token is silently ignored by the bio endpoint
                                             print("🔄 Bio: doing fresh login...")
                                             credentials = load_credentials_from_file("MG24GAMER.txt")
-                                            if credentials:
+                                            if credentials and credentials[0] and credentials[1]:
                                                 Uid_b, Pw_b = credentials[0], credentials[1]
                                                 for attempt in range(3):
                                                     try:
@@ -12052,30 +12074,21 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
         except Exception as e:
             print(f"ErroR {ip}:{port} - {e}")
             whisper_writer = None
-        await asyncio.sleep(reconnect_delay)
+        _fail = 0 if time.time() - _t0 > 30 else min(_fail + 1, 6)
+        _wait = min(reconnect_delay * (2 ** _fail), 30) + random.random()
+        print(f"🔁 Reconnect dalam {_wait:.1f} detik (gagal beruntun: {_fail})")
+        await asyncio.sleep(_wait)
 
 async def MaiiiinE():
     # Load credentials from file
     print("📁 Loading credentials from MG24GAMER.txt...")
-    credentials = load_credentials_from_file("MG24GAMER.txt")
-    
-    if not credentials:
+    Uid, Pw = load_credentials_from_file("MG24GAMER.txt")
+    if not Uid or not Pw:
         print("❌ Failed to load credentials!")
-        print("💡 Please create MG24GAMER.txt with your UID and password")
+        print("💡 Isi MG24GAMER.txt, atau set FF_UID dan FF_PASSWORD di Variables")
         print("📝 Format: uid=YOUR_UID,password=YOUR_PASSWORD")
         return None
-    
-    try:
-        Uid, Pw = credentials
-    except:
-        # Handle case where credentials returns more than 2 values
-        if isinstance(credentials, (list, tuple)) and len(credentials) >= 2:
-            Uid = credentials[0]
-            Pw = credentials[1]
-        else:
-            print("❌ Invalid credentials format!")
-            return None
-    
+
     print("✅ Credentials loaded successfully")
     print(f"🔎 UID={Uid!r} len={len(str(Uid))} | password len={len(str(Pw))}")
     
@@ -12143,7 +12156,7 @@ async def MaiiiinE():
         print(f"🌐 Game server URL set: {BOT_SERVER_URL}")
 
     # Clear screen and show status
-    os.system('clear')
+    _clear()
     print("=" * 50)
     print("🤖 FORKTHUB BOT - INITIALIZING")
     print("=" * 50)
@@ -12200,7 +12213,7 @@ async def MaiiiinE():
  
     
     # Show loading animation
-    os.system('clear')
+    _clear()
     print("🤖 FORKTHUB BOT - STARTING")
     print("=" * 50)
     
@@ -12209,7 +12222,7 @@ async def MaiiiinE():
         print(f"🔄 Loading{dots}")
         await asyncio.sleep(0.3)
     
-    os.system('clear')
+    _clear()
     print("🤖 FORKTHUB BOT - CONNECTING")
     print("=" * 50)
     print("┌────────────────────────────────────┐")
@@ -12225,7 +12238,7 @@ async def MaiiiinE():
         print("⚠️ Chat connection timeout, continuing...")
     
     # Final status display
-    os.system('clear')
+    _clear()
     print("=" * 50)
     print("🤖 FORKTHUBX BOT - ONLINE")
     print("=" * 50)
