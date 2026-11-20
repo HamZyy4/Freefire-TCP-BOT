@@ -5008,7 +5008,7 @@ async def GeNeRaTeAccEss(uid , password):
             async with session.post(url, headers=headers, data=data) as response:
                 body = await response.text()
                 _last_garena_status = response.status 
-                print(f"🔎 Garena status={response.status} | body={body[:300]}")
+                print(f"🔎 Garena status={response.status}" + (f" | body={body[:300]}" if response.status != 200 else ""))
                 if response.status != 200: return (None, None)
                 try:
                     j = json.loads(body)
@@ -5091,10 +5091,17 @@ _no_verify_ssl.verify_mode = ssl.CERT_NONE
 
 async def MajorLogin(payload):
     url = "https://loginbp.ggblueshark.com/MajorLogin"
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=payload, headers=Hr, ssl=_no_verify_ssl) as response:
-            if response.status == 200: return await response.read()
-            return None
+    try:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=20)) as session:
+            async with session.post(url, data=payload, headers=Hr, ssl=_no_verify_ssl) as response:
+                data = await response.read()
+                if response.status == 200:
+                    return data
+                print(f"🔎 MajorLogin status={response.status} | body={data[:200]!r}")
+                return None
+    except Exception as e:
+        print(f"🔎 MajorLogin gagal: {type(e).__name__}: {e}")
+        return None
 
 async def GetLoginData(base_url, payload, token):
     url = f"{base_url}/GetLoginData"
@@ -12102,7 +12109,7 @@ async def MaiiiinE():
     PyL = await EncRypTMajoRLoGin(open_id, access_token)
     MajoRLoGinResPonsE = await MajorLogin(PyL)
     if not MajoRLoGinResPonsE: 
-        print("❌ Target Account => Banned / Not Registered!") 
+        print("❌ MajorLogin ditolak/gagal (lihat baris 🔎 MajorLogin di atas untuk alasan sebenarnya)") 
         return None
     
     # Decrypt login response
