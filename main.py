@@ -113,7 +113,7 @@ _console_guild_bot_uid = None   # Bot's own UID for sending
 _console_guild_chat_type = 1    # 1 = CLan chat type
 _console_squad_chat_id = None   # Squad/group chat ID
 _console_chat_target = "group"  # "guild" or "group" — which chat console sends to
-server2 = "BD"
+server2 = "ID"
 key2 = "mg24"
 BYPASS_TOKEN = "your_bypass_token_here"
 YOUTUBE_API_KEY = "AIzaSyBVP3NiKKJvb-0ar2J3y9IFVVHHWRng4nA"
@@ -249,11 +249,11 @@ def create_credentials_template():
 # Fill in your Free Fire account credentials below
 
 # Format 1: Comma-separated (RECOMMENDED)
-uid=1874001866072,password=Forkt
+uid=1874001866072,password=FORKTHUBX
 
 # OR Format 2: Line-separated
 # uid: 1874001866072
-# password: Forkt
+# password: FORKTHUBX
 
 # Save this file and restart the bot
 """
@@ -4988,13 +4988,24 @@ async def GeNeRaTeAccEss(uid , password):
         "client_type": "2",
         "client_secret": "2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3",
         "client_id": "100067"}
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, data=data) as response:
-            if response.status != 200: return (None, None)
-            data = await response.json()
-            open_id = data.get("open_id")
-            access_token = data.get("access_token")
-            return (open_id, access_token) if open_id and access_token else (None, None)
+    try:
+        timeout = aiohttp.ClientTimeout(total=20)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.post(url, headers=headers, data=data) as response:
+                body = await response.text()
+                print(f"🔎 Garena status={response.status} | body={body[:300]}")
+                if response.status != 200: return (None, None)
+                try:
+                    j = json.loads(body)
+                except Exception:
+                    print("🔎 Jawaban bukan JSON (kemungkinan halaman blokir)")
+                    return (None, None)
+                open_id = j.get("open_id")
+                access_token = j.get("access_token")
+                return (open_id, access_token) if open_id and access_token else (None, None)
+    except Exception as e:
+        print(f"🔎 Gagal terhubung ke Garena: {type(e).__name__}: {e}")
+        return (None, None)
 
 async def EncRypTMajoRLoGin(open_id, access_token):
     major_login = MajoRLoGinrEq_pb2.MajorLogin()
@@ -12066,6 +12077,7 @@ async def MaiiiinE():
             return None
     
     print("✅ Credentials loaded successfully")
+    print(f"🔎 UID={Uid!r} len={len(str(Uid))} | password len={len(str(Pw))}")
     
     # Get access token from Free Fire
     open_id, access_token = await GeNeRaTeAccEss(Uid, Pw)
